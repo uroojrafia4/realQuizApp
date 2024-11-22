@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="style.css">
+
+
+
+</head>
+
+<body>
+    <div id="loading">Loading...</div>
+    <div style="display: none;" id="registration-form">
+        <h1>Register Yourself:</h1>
+        <input id="name" type="text" placeholder="Name" />
+        <input id="email" type="email" placeholder="Email" />
+        <input id="password" type="password" placeholder="Password" />
+        <input id="rollNo" type="text" placeholder="Roll No" />
+        <button id="submit">Submit</button>
+        <p id="log">Already Registered? Sign in here!</p>
+      </div>
+
+      <div style="display: none;" id="login">
+        <div class="login-box">
+          <h2>Welcome Back</h2>
+          <form id="loginForm">
+            <div class="input-group">
+              <label for="email">Email</label>
+              <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input type="password" id="login-password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button id="login-button" class="login-btn">Log In</button>
+            <div class="footer">
+              <p>Don't have an account? <a id="register" onclick="document.getElementById('login').style.display = 'none'; document.getElementById('registration-form').style.display = 'block'; "  href="#">Register Now!</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+      <div id="welcome" style="display: none;">
+        <h1>Welcome, <span id ="nam">User's</span></h1>
+        <p>Which quiz would you like to attempt?</p>
+    
+        <div class="quiz-options">
+          <button class="quiz-btn" id="htmlQuiz" >HTML Quiz</button>
+          <button class="quiz-btn" id="cssQuiz" >CSS Quiz</button>
+          <button class="quiz-btn" id="jsQuiz">JavaScript Quiz</button>
+        </div>
+    
+        <button id="start-quiz">Start Quiz</button>
+        <button id="logout-button">logout</button>
+
+
+      </div>
+      <div id="quiz-container" style="display: none;">
+        <h2 id="question"></h2>
+        <div id="options"></div>
+        <button style="display: none;" id="prev" class="prev">Previous</button>
+        <button style="display: none;" id="prev2" class="prev">Previous</button>
+        <button style="display: none;" id="prev3" class="prev">Previous</button>
+        <button style="display: none;" id="next" class="next">Next</button>
+        <button style="display: none;" id="next2" class="next">Next</button>
+        <button style="display: none;" id="next3" class="next">Next</button>
+      </div>
+
+   
+      
+    
+      
+
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+  
+<script type="module" src="./app.js"></script>
+</body>
+
+</html>
