@@ -1,7 +1,7 @@
 // Import Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp  } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 // Initialize Firestore
 
@@ -256,8 +256,15 @@ function loginUser(email, password) {
                     icon: "error",
                     title: "Account Locked",
                     text: "Too many login attempts. Please try again later.",
+                });}
+           else if(error.code === 'auth/network-request-failed'){
+                Swal.fire({
+                    icon: "error",
+                    title: "Network error",
+                    text: "Please connect to a stable Internet Connection before Proceeding!",
                 });
-            } else {
+              }
+             else {
                 Swal.fire({
                     icon: "error",
                     title: "Login Failed",
@@ -309,6 +316,17 @@ setPersistence(auth, browserLocalPersistence)
         console.error("Error setting persistence:", error);
     });
 
+    document.getElementById("start-quiz").addEventListener('click', () => {
+        if (!selected){
+            Swal.fire({
+                icon: "error",
+                title: "No Quiz is Selected",
+                text: "Please select a quiz to proceed!",
+            });
+            return;
+        }
+    })
+
 function showWelcome() {
     document.getElementById("login").style.display = "none";
     document.getElementById("registration-form").style.display = "none";
@@ -316,8 +334,9 @@ function showWelcome() {
     document.getElementById("nam").innerHTML = name1.value;
 
 }
+let selected = false;
 htmlQuiz.addEventListener('click', () => {
-
+   selected = true;
     document.getElementById("start-quiz").addEventListener('click', () => {
         document.getElementById("welcome").style.display = "none";
         document.getElementById("quiz-container").style.display = "block";
@@ -328,6 +347,7 @@ htmlQuiz.addEventListener('click', () => {
 
 
 cssQuiz.addEventListener('click', () => {
+    selected = true;
     document.getElementById("start-quiz").addEventListener('click', () => {
         document.getElementById("welcome").style.display = "none";
         document.getElementById("quiz-container").style.display = "block";
@@ -337,6 +357,7 @@ cssQuiz.addEventListener('click', () => {
 })
 
 jsQuiz.addEventListener('click', () => {
+    selected = true;
     document.getElementById("start-quiz").addEventListener('click', () => {
         document.getElementById("welcome").style.display = "none";
         document.getElementById("quiz-container").style.display = "block";
@@ -572,7 +593,8 @@ async function calculateResult() {
             userId: user.uid,
             score: score,
             percentage: percentage,
-            date: new Date().toISOString(),
+            date: Timestamp.now(),
+            quiz : 'HTML',
         });
         console.log("Result saved successfully!");
         Swal.fire({
@@ -584,21 +606,21 @@ async function calculateResult() {
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Could not save your result. Please try again."
+            text: "Could not save your result. Please try again "+error
         });
     }
 
-    // Display the result
     document.getElementById("quiz-container").innerHTML = `
-        <div id="result">
-        <h2>Quiz Completed</h2>
-        <p style="color: ${resultColor};">${resultMessage}</p>
-        <div style="margin-top: 20px;">
-            <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: #D8D2C2; color: #4A4947;border:solid; border-color:#4A4947 ; border-radius: 5px; cursor: pointer;">Logout</button>
-            <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #4A4947; color: #D8D2C2; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
-        </div>
-        </div>
-      `;
+    <div id="result">
+    <h2>Quiz Completed</h2>
+    <p style="color: ${resultColor};">${resultMessage}</p>
+    <div style="margin-top: 20px;">
+        <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: rgba(255, 255, 255, 0); color: #120035;border:solid; border-color: #120035 ; border-radius: 5px; cursor: pointer;">Logout</button>
+        <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #31136b; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
+    </div>
+    </div>
+  `;
+
 
     // Add event listeners for buttons
     document.getElementById("logout-btn").addEventListener("click", () => {
@@ -647,7 +669,8 @@ async function calculateResult2() {
             userId: user.uid,
             score: score,
             percentage: percentage,
-            date: new Date().toISOString(),
+            date: Timestamp.now(),
+             quiz : 'CSS',
         });
         console.log("Result saved successfully!");
         Swal.fire({
@@ -664,15 +687,16 @@ async function calculateResult2() {
     }
     // Display the result
     document.getElementById("quiz-container").innerHTML = `
-        <div id="result2">
-        <h2>Quiz Completed</h2>
-        <p style="color: ${resultColor};">${resultMessage}</p>
-        <div style="margin-top: 20px;">
-            <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: #D8D2C2; color: #4A4947;border:solid; border-color:#4A4947 ; border-radius: 5px; cursor: pointer;">Logout</button>
-            <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #4A4947; color: #D8D2C2; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
-        </div>
-        </div>
-      `;
+    <div id="result2">
+    <h2>Quiz Completed</h2>
+    <p style="color: ${resultColor};">${resultMessage}</p>
+    <div style="margin-top: 20px;">
+        <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: rgba(255, 255, 255, 0); color: #120035;border:solid; border-color: #120035 ; border-radius: 5px; cursor: pointer;">Logout</button>
+        <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #31136b; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
+    </div>
+    </div>
+  `;
+
 
     // Add event listeners for buttons
     document.getElementById("logout-btn").addEventListener("click", () => {
@@ -721,7 +745,9 @@ async function calculateResult3() {
             userId: user.uid,
             score: score,
             percentage: percentage,
-            date: new Date().toISOString(),
+            date: Timestamp.now(),
+            quiz : JavaScript,
+            // quizName : 'javaScript',
         });
         console.log("Result saved successfully!");
         Swal.fire({
@@ -744,8 +770,8 @@ async function calculateResult3() {
         <h2>Quiz Completed</h2>
         <p style="color: ${resultColor};">${resultMessage}</p>
         <div style="margin-top: 20px;">
-            <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: #D8D2C2; color: #4A4947;border:solid; border-color:#4A4947 ; border-radius: 5px; cursor: pointer;">Logout</button>
-            <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #4A4947; color: #D8D2C2; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
+            <button id="logout-btn" style="padding: 10px 20px; margin: 5px; background-color: rgba(255, 255, 255, 0); color: #120035;border:solid; border-color: #120035 ; border-radius: 5px; cursor: pointer;">Logout</button>
+            <button id="another-quiz-btn" style="padding: 10px 20px; margin: 5px; background-color: #31136b; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Take Another Quiz</button>
         </div>
         </div>
       `;
@@ -753,13 +779,68 @@ async function calculateResult3() {
     // Add event listeners for buttons
     document.getElementById("logout-btn").addEventListener("click", () => {
         showlogin(); // Navigate to login page
-        document.getElementById('result2').style.display = 'none';
+        document.getElementById('result3').style.display = 'none';
     });
 
     document.getElementById("another-quiz-btn").addEventListener("click", () => {
         location.reload(); // Refresh the page
     });
 }
+
+async function fetchUserResults() {
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error("User is not logged in");
+        }
+
+        const resultsRef = collection(db, "results");
+        const q = query(resultsRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        // Create HTML to display the results
+        let resultsHTML = "<h2>Your Quiz Results</h2><ul>";
+        // if (querySnapshot.empty) {
+        //     // No results found for the user
+        //     resultsHTML += `
+        //         <p>No results found. Please take a quiz to see results.</p>
+        //     `};
+            
+        querySnapshot.forEach((doc) => {
+            const result = doc.data();
+            const formattedDate = result.date 
+                ? (result.date.toDate ? result.date.toDate() : new Date(result.date)).toLocaleDateString()
+                : "Unknown Date";
+            resultsHTML += `
+                <li style="list-style-type: none; padding: 0; max-width: 600px; margin: auto; font-family: Arial, sans-serif;">
+
+                 <strong>Quiz:</strong> ${result.quiz}<br>
+                    <strong>Date:</strong> ${formattedDate}<br>
+                    <strong>Score:</strong> ${result.score}<br>
+                    <strong>Percentage:</strong> ${result.percentage.toFixed(2)}%<br>
+                </li><hr>`;
+        });
+        resultsHTML += "</ul>";
+        resultsHTML += "<button id='back'>Back to Home</button>";
+       
+
+        document.getElementById("welcome").innerHTML = resultsHTML;
+        document.getElementById("back").addEventListener("click", () => {
+            location.reload(); 
+        });
+    } catch (error) {
+        console.error("Error fetching results:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to fetch results. Please try again."
+        });
+    }
+}
+
+// Attach the event listener to the button
+document.getElementById("read").addEventListener("click", fetchUserResults);
+
 
 
 
