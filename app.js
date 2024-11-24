@@ -1,6 +1,6 @@
 // Import Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence,GoogleAuthProvider , signInWithPopup } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp  } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 // Initialize Firestore
@@ -316,6 +316,33 @@ setPersistence(auth, browserLocalPersistence)
         console.error("Error setting persistence:", error);
     });
 
+    // Google Sign-In
+const googleSigninButton = document.getElementById("google-signin-btn");
+
+googleSigninButton.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const provider = new GoogleAuthProvider();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        console.log("Google user signed in:", user);
+        Swal.fire({
+            title: "Login Successful",
+            icon: "success",
+        }).then(() => {
+            showWelcome();  // Navigate to welcome page
+        });
+    } catch (error) {
+        console.error("Error during Google sign-in:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Google Sign-In Failed",
+            text: error.message,
+        });
+    }
+});
+
+
     document.getElementById("start-quiz").addEventListener('click', () => {
         if (!selected){
             Swal.fire({
@@ -326,6 +353,8 @@ setPersistence(auth, browserLocalPersistence)
             return;
         }
     })
+
+
 
 function showWelcome() {
     document.getElementById("login").style.display = "none";
